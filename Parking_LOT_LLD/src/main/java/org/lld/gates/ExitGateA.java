@@ -30,6 +30,7 @@ public class ExitGateA implements ExitGate{
         ParkingSpot spot=ticket.getParkingSpot();
         spot.vacate();
 
+
         double amt= vehicle.calculateFee(hours);
        Payment paymentStrategy= paymentService.processPayment();
         paymentStrategy.pay(amt);
