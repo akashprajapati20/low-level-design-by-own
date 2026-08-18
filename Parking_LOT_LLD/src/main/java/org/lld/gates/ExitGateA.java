@@ -11,15 +11,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class ExitGateA implements ExitGate{
-    private final PaymentService paymentService;
-
-    public ExitGateA(PaymentService paymentService) {
-        this.paymentService = paymentService;
-
-    }
 
     @Override
-    public void processPayment(Ticket ticket) {
+    public double processTicket(Ticket ticket) {
         LocalDateTime entryTime = ticket.getEntryTime();
         LocalDateTime exitTime= LocalDateTime.now();
         Duration duration = Duration.between(entryTime, exitTime);
@@ -32,8 +26,7 @@ public class ExitGateA implements ExitGate{
 
 
         double amt= vehicle.calculateFee(hours);
-       Payment paymentStrategy= paymentService.processPayment();
-        paymentStrategy.pay(amt);
+       return amt;
 
     }
 }

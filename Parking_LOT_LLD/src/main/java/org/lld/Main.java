@@ -2,6 +2,7 @@ package org.lld;
 
 
 import org.lld.PaymentService.Payment;
+import org.lld.PaymentService.PaymentMethod;
 import org.lld.PaymentService.PaymentService;
 import org.lld.gates.EntryGate;
 import org.lld.gates.EntryGateA;
@@ -17,6 +18,7 @@ import org.lld.vehicle.Vehicle;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -35,7 +37,16 @@ public class Main {
 
         EntryGate entryGate=new EntryGateA(parkingLot);
 
-        PaymentService paymentService=new PaymentService();
+
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Choose: 1 -> UPI, 2 -> Card");
+        int choice = sc.nextInt();
+
+        PaymentMethod method = (choice == 1) ? PaymentMethod.UPI : PaymentMethod.CARD;
+PaymentService paymentService=new PaymentService();
+        Payment payment = paymentService.createPayment(method);   // decision handed IN
+
+
         ExitGate exitGate=new ExitGateA(paymentService);
 
 
@@ -48,8 +59,8 @@ public class Main {
         spot3.getVehicle();
         spot4.getVehicle();
 
-        exitGate.processPayment(ticket);
-
+       double amountToPay= exitGate.processTicket(ticket);
+        payment.pay(amountToPay);
 
     }
 }
