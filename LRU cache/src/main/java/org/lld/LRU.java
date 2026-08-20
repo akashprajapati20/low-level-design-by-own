@@ -7,6 +7,7 @@ public class LRU {
     Map<Integer, Node> map = new HashMap<>();
     DoublyLinkedList doublyLinkedList;
     int capacity;
+
     public LRU(DoublyLinkedList doublyLinkedList,int capacity) {
         this.doublyLinkedList = doublyLinkedList;
         this.capacity=capacity;
