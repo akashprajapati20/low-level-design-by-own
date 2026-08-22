@@ -15,7 +15,7 @@ public class SelectedProduct implements State{
      vendingMachine.addBalance(amt);
      if(vendingMachine.getBalance()<selectedProductPrice){
          System.out.println("not sufficent amount inserted");
-         vendingMachine.setCurrentState(vendingMachine.getNoCoinState());
+
      }else{
          vendingMachine.processChangeAmt();
          vendingMachine.setCurrentState(vendingMachine.getHasCoinState());
