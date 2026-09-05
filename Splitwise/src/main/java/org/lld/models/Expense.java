@@ -1,4 +1,6 @@
-package org.lld;
+package org.lld.models;
+
+import org.lld.SplitTypes;
 
 import java.util.List;
 
