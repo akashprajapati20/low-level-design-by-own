@@ -12,7 +12,7 @@ public class PercentageSplitStrategy implements SplitStrategy{
     @Override
     public List<Split> getSplits(double totalAmount, List<User>participants, Map<User, Double>metadata) {
         double totalPercent=metadata.values().stream().mapToDouble(Double::doubleValue).sum();
-        if(totalPercent!=100)throw new IllegalArgumentException("total percenty should be 100");
+        if(Math.abs(totalPercent - 100) > 1e-6) throw new IllegalArgumentException("total percentage should be 100");
 
         List<Split>all_splits=new ArrayList<>();
         for(User u:participants){

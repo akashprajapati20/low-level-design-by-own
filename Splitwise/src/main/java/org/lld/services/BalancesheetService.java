@@ -25,4 +25,21 @@ public class BalancesheetService {
             }
         }
     }
+
+    public void showBalances(Group group){
+        boolean anyDebt = false;
+        for(User user : group.getUsers()){
+            Map<User, Double> balances = group.getBalanceSheetMap(user).getBalances();
+            for(Map.Entry<User, Double> entry : balances.entrySet()){
+                // print each debt once, from the debtor's side (negative balance)
+                if(entry.getValue() < 0){
+                    System.out.println(user.getName() + " owes " + entry.getKey().getName() + " : " + (-entry.getValue()));
+                    anyDebt = true;
+                }
+            }
+        }
+        if(!anyDebt){
+            System.out.println("All settled up!");
+        }
+    }
 }

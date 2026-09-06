@@ -9,14 +9,15 @@ import org.lld.splitStrategy.SplitFactory;
 import org.lld.splitStrategy.SplitStrategy;
 
 import java.util.List;
+import java.util.Map;
 
 public class ExpenseService {
 BalancesheetService balancesheetService=new BalancesheetService();
 
 
-    public void  addExpense(User paidBy, String desc, double amount, SplitTypes splitTypes, List<User>users,Group group){
+    public void  addExpense(User paidBy, String desc, double amount, SplitTypes splitTypes, List<User>users, Group group, Map<User, Double> meta){
        SplitStrategy splitStrategy= SplitFactory.getSplitStrategy(splitTypes);
-        List<Split>splits= splitStrategy.getSplits(amount,users,null);
+        List<Split>splits= splitStrategy.getSplits(amount,users,meta);
         Expense expense1=new Expense(paidBy,desc,amount,splitTypes,splits);
         group.addExpense(expense1);
         balancesheetService.updateBalances(paidBy,splits,group);
