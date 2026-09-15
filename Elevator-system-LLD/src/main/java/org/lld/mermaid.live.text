@@ -1,0 +1,150 @@
+---
+config:
+  theme: mc
+---
+classDiagram
+    direction LR
+
+    %% ---------- Enums ----------
+    class Direction {
+        <<enumeration>>
+        UP
+        DOWN
+        IDLE
+    }
+    class DoorState {
+        <<enumeration>>
+        OPEN
+        OPENING
+        CLOSED
+        CLOSING
+    }
+
+    %% ---------- Requests ----------
+    class Request {
+        <<interface>>
+        +getFloor() int
+    }
+    class HallRequest {
+        -int floor
+        -Direction direction
+        +getFloor() int
+        +getDirection() Direction
+    }
+    class CarRequest {
+        -int destinationFloor
+        +getFloor() int
+    }
+    Request <|.. HallRequest
+    Request <|.. CarRequest
+
+    %% ---------- Buttons (Command) ----------
+    class Button {
+        <<interface>>
+        +press() Request
+    }
+    class HallButton {
+        -int floor
+        -Direction direction
+        -ElevatorSystem system
+        +press() HallRequest
+    }
+    class CarButton {
+        -int destinationFloor
+        -Elevator elevator
+        +press() CarRequest
+    }
+    Button <|.. HallButton
+    Button <|.. CarButton
+    HallButton ..> HallRequest : creates
+    CarButton  ..> CarRequest : creates
+    HallButton --> ElevatorSystem : submits to
+    CarButton  --> Elevator : submits to
+
+    %% ---------- State ----------
+    class ElevatorState {
+        <<interface>>
+        +step(Elevator) void
+        +getDirection() Direction
+        +name() String
+    }
+    class IdleState
+    class MovingUpState
+    class MovingDownState
+    class DoorOpenState
+    ElevatorState <|.. IdleState
+    ElevatorState <|.. MovingUpState
+    ElevatorState <|.. MovingDownState
+    ElevatorState <|.. DoorOpenState
+
+    %% ---------- Scheduling Strategy (which stop next) ----------
+    class SchedulingStrategy {
+        <<interface>>
+        +nextStop(Elevator) Integer
+    }
+    class LookSchedulingStrategy
+    class FcfsStrategy
+    SchedulingStrategy <|.. LookSchedulingStrategy
+    SchedulingStrategy <|.. FcfsStrategy
+
+    %% ---------- Selection Strategy (which elevator) ----------
+    class ElevatorSelectionStrategy {
+        <<interface>>
+        +selectElevator(List~Elevator~, HallRequest) Elevator
+    }
+    class NearestElevatorStrategy
+    class LeastBusyStrategy
+    ElevatorSelectionStrategy <|.. NearestElevatorStrategy
+    ElevatorSelectionStrategy <|.. LeastBusyStrategy
+
+    %% ---------- Observer ----------
+    class ElevatorObserver {
+        <<interface>>
+        +update(Elevator) void
+    }
+    class Display {
+        -String name
+        +update(Elevator) void
+    }
+    ElevatorObserver <|.. Display
+
+    %% ---------- Core domain ----------
+    class Door {
+        -DoorState state
+        +open() void
+        +close() void
+        +isOpen() boolean
+    }
+    class Elevator {
+        -int id
+        -int currentFloor
+        -Direction direction
+        -Set~Integer~ stops
+        +step() void
+        +handleCarRequest(CarRequest) void
+        +addStop(int) void
+        +removeStop(int) void
+        +addObserver(ElevatorObserver) void
+    }
+    class ElevatorSystem {
+        -List~Elevator~ elevators
+        +handleHallRequest(HallRequest) void
+        +step() void
+        +hasPendingWork() boolean
+    }
+
+    %% ---------- Composition / usage ----------
+    Elevator *-- Door : owns
+    Elevator o-- ElevatorState : current state
+    Elevator o-- SchedulingStrategy : injected
+    Elevator o-- "*" ElevatorObserver : notifies
+    Elevator ..> Direction : uses
+    Door ..> DoorState : uses
+
+    ElevatorSystem o-- "*" Elevator : manages
+    ElevatorSystem o-- ElevatorSelectionStrategy : injected
+    ElevatorSystem ..> HallRequest : routes
+
+    ElevatorState ..> Elevator : mutates + transitions
+    SchedulingStrategy ..> Elevator : reads stops
+    ElevatorSelectionStrategy ..> Elevator : ranks
