@@ -1,6 +1,5 @@
 package org.lld.locks;
 
-import java.util.Timer;
 import java.util.concurrent.*;
 
 public class InMemoryLockProvider implements LockProvider{
@@ -18,7 +17,11 @@ public class InMemoryLockProvider implements LockProvider{
        }
    }
     private  final ConcurrentHashMap<String,Expiry> locks=new ConcurrentHashMap<>();
-   private final ScheduledExecutorService sweeper= Executors.newSingleThreadScheduledExecutor();
+   private final ScheduledExecutorService sweeper = Executors.newSingleThreadScheduledExecutor(r -> {
+       Thread t = new Thread(r, "lock-sweeper");
+       t.setDaemon(true);   // daemon so the JVM can exit when main finishes
+       return t;
+   });
 
    public InMemoryLockProvider(){
        sweeper.scheduleAtFixedRate(this::sweep,1,1, TimeUnit.MINUTES);
